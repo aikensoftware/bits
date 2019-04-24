@@ -660,30 +660,36 @@ class Pelanggan extends CI_Controller {
 		$bulan_ini = date('m');
 		$tahun_ini = date('Y');
 		
-		$dt_cek = $this->db->query("select * from tag_tagihan where month(tanggal) = $bulan_ini and year(tanggal) = $tahun_ini ");
+		$dt_cek = $this->db->query("select * from tag_tagihan where month(tanggal) = $bulan_ini and year(tanggal) = $tahun_ini order by id_tagihan DESC");
 		if($dt_cek->num_rows() > 0)
 		{
-			$this->session->set_flashdata('message', 'Bulan ini sudah dibuat tagihan.');
-			//redirect('tag_pelanggan/cari_data');
-		}
-		
-		
-		$dt_nomor_akhir = $this->db->query("select id_tagihan from tag_tagihan order by id_tagihan desc LIMIT 1");
-		if($dt_nomor_akhir->num_rows() >0){
-			$r = $dt_nomor_akhir->row();
-			$awal=$r->id_tagihan+1;
+//			$this->session->set_flashdata('message', 'Bulan ini sudah dibuat tagihan.');
+//			redirect('pelanggan');
+			$awal=$dt_cek->row()->no_transaksi+1;
 		}else{
-			$awal=0;
+			$awal=1;
 		}
 		
-		//$awal = $this->input->post('nomor_faktur_awal',true);
-		if($awal > 0){
+		// $awal = $this->input->post('nomor_faktur_awal',true);
+		
+		 $jml_limit = $this->input->post('nomor_faktur_awal',true);
+
+		// if($awal > 0){
 			$dt_layanan = $this->db->query("select * from tag_layanan ");
 			if($dt_layanan->num_rows() >0){
 				foreach($dt_layanan->result() as $b){
 					$jenis[$b->id_layanan] = $b->harga;
 				}
 			}
+			
+			/* yang lama
+			$dt_pelanggan = $this->db->query("select a.* 
+												from tag_pelanggan as a
+												left join tag_tagihan as b on a.id_pelanggan = b.id_pelanggan
+												where a.status = 1 and b.id_pelanggan is null 
+												
+												");
+			*/
 			
 			$dt_pelanggan = $this->db->query("
 												SELECT * 
@@ -692,10 +698,9 @@ class Pelanggan extends CI_Controller {
 												from tag_tagihan as a
 												right join tag_pelanggan as b on a.id_pelanggan = b.id_pelanggan
 												where  month(tanggal) = $bulan_ini and year(tanggal) = $tahun_ini
-												group by a.id_pelanggan) and status = 1
-											");
+												group by a.id_pelanggan) and status = 1 LIMIT ".$jml_limit);
 			$jml_aktif = $dt_pelanggan->num_rows();
-			$nomor = 'BITS';			
+			//$nomor = '';			
 			if($jml_aktif > 0){
 				$in = array();
 				foreach($dt_pelanggan->result() as $p){
@@ -731,18 +736,18 @@ class Pelanggan extends CI_Controller {
 					# update utk kode barang pada brg_nama
 					
 						
-					switch (strlen($awal)) 
-					{     
-						case 1 : $kode = "000".$awal; 
-						break;     
-						case 2 : $kode = "00".$awal; 
-						break;  
-						case 3 : $kode = "0".$awal; 
-						break;
-						default: $kode = $awal;    
-					}  
+					// switch (strlen($awal)) 
+					// {     
+					// 	case 1 : $kode = "000".$awal; 
+					// 	break;     
+					// 	case 2 : $kode = "00".$awal; 
+					// 	break;  
+					// 	case 3 : $kode = "0".$awal; 
+					// 	break;
+					// 	default: $kode = $awal;    
+					// }  
 							
-					$v_no_transaksi = $nomor.''.$kode;
+					$v_no_transaksi = $awal;
 					
 					$in[] = array(
 								'no_transaksi'	=> $v_no_transaksi,
@@ -763,10 +768,10 @@ class Pelanggan extends CI_Controller {
 			}
 			$this->session->set_flashdata('message', '<strong>Sukses !</strong> Bulan ini sudah dibuat tagihan.');
 			redirect('pelanggan');
-		}else{
-			$this->session->set_flashdata('message', 'Nomor Faktur Awal Tidak Boleh Kosong');
-			redirect('pelanggan');
-		}
+		// }else{
+		// 	$this->session->set_flashdata('message', 'Nomor Faktur Awal Tidak Boleh Kosong');
+		// 	redirect('pelanggan');
+		// }
 	}
 
 	public function rstfilter()
@@ -887,8 +892,14 @@ class Pelanggan extends CI_Controller {
 				$d['pajak']				= $b_ini->pajak;
 				$d['total']				= $b_ini->pokok + $b_ini->pajak;
 				$d['qrcode']			= $b_ini->qrcode;
-				
-				$this->load->view('tag_pelanggan/print_faktur', $d);
+				$d['tanggal']			=date("d", strtotime($b_ini->tanggal));
+				$d['tahun']				=$b_ini->tahun;
+				$d['bulan']				=substr('0'.$b_ini->bulan,-2,2);
+				if(substr($b_ini->no_transaksi, 0,4)=='BITS'){
+					$this->load->view('tag_pelanggan/print_faktur', $d);
+				}else{
+					$this->load->view('tag_pelanggan/kwitansi', $d);
+				}
 			}else{
 				$this->session->set_flashdata('message', 'Halaman anda cari tidak ditemukan');
 				redirect('pelanggan');
@@ -900,6 +911,60 @@ class Pelanggan extends CI_Controller {
 		}
 		
 	}
+	
+	public function cetak_faktur_ulang()
+	{
+		$level = $this->session->userdata('DX_role_id');
+		$this->load->model('umum');
+		$bulan_ini = date('m');
+		$tahun_ini = date('Y');
+
+		$id_tagihan = $this->uri->segment(3);
+		if($id_tagihan > 0){
+			$tagihan_bulan_ini = $this->db->query("select a.qrcode, a.id_tagihan, date(a.tanggal) as tanggal, month(a.tanggal) as bulan,
+												year(a.tanggal) as tahun, a.no_transaksi, a.total_tagihan, a.pokok, a.pajak,
+												b.kode, b.nama, b.alamat
+												
+												from tag_tagihan as a
+												left join tag_pelanggan as b on a.id_pelanggan = b.id_pelanggan
+												
+												where 
+												a.id_tagihan 		= $id_tagihan ");
+												
+			if($tagihan_bulan_ini->num_rows() >0){
+				$b_ini = $tagihan_bulan_ini->row();
+				$d['id_tagihan'] 		= $b_ini->id_tagihan;
+				$d['bulan_tagihan']		= $this->umum->nama_bulan($b_ini->bulan).' '.$b_ini->tahun;
+				$d['nomor_tagihan']		= $b_ini->no_transaksi;
+				$d['tanggal_bayar']		= $this->umum->ubah_ke_garis($b_ini->tanggal);
+				$d['nama_pelanggan']	= '['.$b_ini->kode.'] '.$b_ini->nama;
+				$d['alamat_pelanggan']	= $b_ini->alamat;
+
+				$d['abonemen']			= $b_ini->pokok;
+				$d['pajak']				= $b_ini->pajak;
+				$d['total']				= $b_ini->pokok + $b_ini->pajak;
+				$d['qrcode']			= $b_ini->qrcode;
+				$d['tanggal']			=date("d", strtotime($b_ini->tanggal));
+				$d['tahun']				=$b_ini->tahun;
+				$d['bulan']				=substr('0'.$b_ini->bulan,-2,2);
+				if(substr($b_ini->no_transaksi, 0,4)=='BITS'){
+					$this->load->view('tag_pelanggan/print_faktur', $d);
+				}else{
+					$this->load->view('tag_pelanggan/kwitansi', $d);
+				}
+				//$this->load->view('admin/tag_pelanggan/print_faktur', $d);
+				//$this->load->view('tag_pelanggan/kwitansi', $d);
+				
+			}else{
+				$this->session->set_flashdata('message', 'Halaman anda cari tidak ditemukan');
+				redirect('pelanggan');
+			}
+		
+		}else{
+			redirect('pelanggan');
+		}
+	}
+	
 	public function printAll()
 	{
 		$bulan_ini = date('m');
@@ -952,10 +1017,11 @@ class Pelanggan extends CI_Controller {
 			$d['id_tagihan'] 		= $b_ini->id_tagihan;
 			$d['data_faktur_all']	= $tagihan_bulan_ini;
 			
-			$this->load->view('tag_pelanggan/print_faktur', $d);
+			//$this->load->view('tag_pelanggan/print_faktur', $d);
+			$this->load->view('tag_pelanggan/kwitansi', $d);
 		}else{
 			$this->session->set_flashdata('message', 'Halaman anda cari tidak ditemukan');
-			redirect('tag_pelanggan/cari_data');
+			redirect('pelanggan');
 	
 		}
 		

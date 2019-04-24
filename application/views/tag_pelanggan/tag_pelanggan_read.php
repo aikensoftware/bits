@@ -80,7 +80,7 @@
 								echo '<tr>
 										<td>'.$no.'</td>
 										<td>'.$det->tanggal.'</td>
-										<td><a href="'.$base.'/tag_pelanggan/cetak_faktur_ulang/'.$det->id_tagihan.'">'.$det->no_transaksi.'</a></td>
+										<td><a target="blank" href="'.$base.'/pelanggan/cetak_faktur_ulang/'.$det->id_tagihan.'">'.$det->no_transaksi.'</a></td>
 										<td style="text-align:right;">'.$this->umum->format_rupiah($det->total_tagihan).'</td>
 										<td style="text-align:right;">'.$this->umum->format_rupiah($det->pokok).'</td>
 										<td style="text-align:right;">'.$this->umum->format_rupiah($det->pajak).'</td>

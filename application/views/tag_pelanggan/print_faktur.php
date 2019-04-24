@@ -3,7 +3,7 @@
 <html lang="en">
 	<head>
 	<meta charset="utf-8">
-    <title>Cetak Kwitansi</title>
+    <title>Cetak Nota Besar</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -82,6 +82,21 @@
 								<table width="100%">
 									<tr>
 										<td >
+											<img src="https://bits.net.id/images/site/logo-web-bits-net.png" >
+											
+										</td>
+										<td >
+											Bukti Pembayaran Jasa Internet<br/>
+											FAKTUR PAJAK<br/>
+											<?php
+												$dt_usaha = $this->db->query("select * from tag_usaha");
+												if($dt_usaha->num_rows() > 0){
+													$r = $dt_usaha->row();
+													echo $r->nama.' '.$r->alamat.'<br/>';							
+												}
+											?>
+										</td>
+										<td>
 											<?php
 												if(isset($qrcode) && $qrcode <> ''){
 													$base = site_url();
@@ -93,18 +108,6 @@
 												<a href='http://www.qrcode-generator.de' border='0' style='cursor:default'  rel='nofollow'></a>
 
 											<?php		
-												}
-											?>
-											
-										</td>
-										<td >
-											Bukti Pembayaran Jasa Internet<br/>
-											FAKTUR PAJAK<br/>
-											<?php
-												$dt_usaha = $this->db->query("select * from tag_usaha");
-												if($dt_usaha->num_rows() > 0){
-													$r = $dt_usaha->row();
-													echo $r->nama.' '.$r->alamat.'<br/>';							
 												}
 											?>
 										</td>
@@ -278,6 +281,6 @@
 		<?php } ?>	
 			
 		<br/>
-		<div class="dontprint"><a href="<?php echo site_url(); ?>/tag_pelanggan/cari_data">Kembali ke data pelanggan </a></div>
+		<div class="dontprint"><a href="<?php echo site_url(); ?>/pelanggan">Kembali ke data pelanggan </a></div>
 	</body>
 </html>

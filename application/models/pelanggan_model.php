@@ -545,34 +545,33 @@ class Pelanggan_model extends CI_Model
 	{
 		$dsp =  '<div class="col-md-8">
 						<div class="panel panel-default">
-							<div class="panel-heading">Langkah membuat tagihan</div>
+							<div class="panel-heading"> 1. Langkah membuat tagihan</div>
 							<div class="panel-body">';
 								
-							$dt_nomor_akhir = $this->db->query("select id_tagihan from tag_tagihan order by id_tagihan desc LIMIT 1");
-							if($dt_nomor_akhir->num_rows() >0){
-								$r = $dt_nomor_akhir->row();
-								$notrans_akhir=$r->id_tagihan;
-							}else{
-								$notrans_akhir='BITS0';
-							}
-							
-							switch (strlen($id_baru)) 
-							{    
-								case 1 : $kode = "000".$id_baru; 
-								break; 			
-								case 2 : $kode = "00".$id_baru; 
-								break;  
-								case 3 : $kode = "0".$id_baru; 
-								break;  
-								default: $kode = $id_baru;    
-							}  
-							
-							$dsp .="Nomor ".$kdAwal;
-							
+							// $dt_nomor_akhir = $this->db->query("select no_transaksi from tag_tagihan order by id_tagihan desc LIMIT 1");
+							// if($dt_nomor_akhir->num_rows() >0){
+							// 	$r = $dt_nomor_akhir->row();
+							// 	$notrans_akhir=$r->no_transaksi;
+							// }else{
+							// 	$notrans_akhir='BITS0';
+							// }
+							// $notrans_akhir=trim(substr($notrans_akhir, 4,strlen($notrans_akhir)-4));
+
+							// $kdAwal=strval($notrans_akhir) + 1;			
+
 											
 							$dt_pelanggan = $this->db->query("select * from tag_pelanggan where status = 1 ");
 							$jml_aktif = $dt_pelanggan->num_rows(); 
 
+										$sql="SELECT * 
+												FROM `tag_pelanggan`
+												where id_pelanggan not in (SELECT b.id_pelanggan
+												from tag_tagihan as a
+												right join tag_pelanggan as b on a.id_pelanggan = b.id_pelanggan
+												where  month(tanggal) = month(NOW()) and year(tanggal) = year(NOW())
+												group by a.id_pelanggan) and status = 1";
+							$dt_pel=$this->db->query($sql);
+							$jml_blm=$dt_pel->num_rows();
 
 							$attrib =array('name'=>'frm_kategori','role'=>'form','onSubmit' => "return confirm('Anda yakin akan membuat faktur tagihan ?')");
 		$dsp .=				 form_open_multipart('pelanggan/simpan_faktur', $attrib); 
@@ -584,10 +583,10 @@ class Pelanggan_model extends CI_Model
 										<td><span class="label label-default">'.$jml_aktif.'</span></td>
 									</tr>
 									<tr>
-										<td style="text-align:right;">Nomor Faktur Awal</td>
+										<td style="text-align:right;">Jumlah Faktur yang akan dibuat</td>
 										<td style="text-align:center;">:&nbsp;</td>
 										<td>
-											<input class="form-control" type="number" name="nomor_faktur_awal" value="'.$kdAwal.'" placeholder="" autocomplete="off">
+											<input class="form-control" type="number" name="nomor_faktur_awal" value="'.$jml_blm.'" placeholder="" autocomplete="off">
 										</td>
 									</tr>
 									<tr>
@@ -596,7 +595,6 @@ class Pelanggan_model extends CI_Model
 											<br/>
 											<input type="submit" value="1) Klik untuk membuat tagihan " class="btn btn-primary btn-sm" >
 										
-											<a href="'.site_url().'/pelanggan/create_qrcode" class="btn btn-primary btn-sm" onClick="return confirm(\'Anda yakin membuat QR code ?\')" > 2) Klik untuk membuat QR code </a>
 										</td>
 									</tr>
 								</table>'.
@@ -607,7 +605,24 @@ class Pelanggan_model extends CI_Model
 							</div>
 						</div>
 				</div>';
+				
+				
+			$dsp .=  '<div class="col-md-8">
+						<div class="panel panel-default">
+							<div class="panel-heading">2. Memberikan QR code</div>
+							<div class="panel-body">
+							
+							
+											<a href="'.site_url().'/pelanggan/create_qrcode" class="btn btn-primary btn-sm" onClick="return confirm(\'Anda yakin membuat QR code ?\')" > 2) Klik untuk membuat QR code </a>
+							';
+							
+							
+			$dsp .= '		</div>
+						</div>
+					</div>';
+							
 		return $dsp;				
+			
 
 	}
 	public function display_form_filter($kode=NULL,$nama=NULL,$alamat=NULL,$id_patner=NULL,$id_status=NULL){
