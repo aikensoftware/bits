@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>SIM-BITZNET | LOGIN </title>
+    <title>SIM-BITSNET | LOGIN </title>
 
     <!-- Bootstrap -->
     <link href="{url}assets/template/default/vendors/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">

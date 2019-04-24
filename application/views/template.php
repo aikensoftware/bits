@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>SIM-BITZNET</title>
+    <title>SIM-BITSNET</title>
 	<link rel="icon" type="image/png" href="<?php echo base_url('assets/images/gambar.png')?>">
 	<!-- Bootstrap -->
   
@@ -86,7 +86,7 @@
           <div class="pull-right">
 			<div>
 				<div style="float:left; padding-right:2px;">
-					Sistem Informasi Bitznet &copy; 2018. Version 1.0.0 | 
+					Sistem Informasi Bitsnet &copy; 2018. Version 1.0.0 | 
 				</div>
 				<div style="float:right;">
 					Rendered in <strong>{elapsed_time}</strong> seconds.
