@@ -65,6 +65,9 @@
 					$pajak				= $b_ini->pajak;
 					$total				= $b_ini->pokok + $b_ini->pajak;
 					$qrcode				= $b_ini->qrcode;
+					
+					$tahun				=$b_ini->tahun;
+					$bulan				=substr('0'.$b_ini->bulan,-2,2);
 		?>
 		
 		
