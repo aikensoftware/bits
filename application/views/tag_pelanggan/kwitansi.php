@@ -164,7 +164,10 @@
 								<td >&nbsp; </td>
 								
 								<td colspan="2" align="center">Cirebon, <?php echo isset($tanggal)?$tanggal:''; ?> <?php echo isset($bulan_tagihan)?$bulan_tagihan:''; ?><br>
-									PT. BINA INFORMATIKA SOLUSI
+									PT. BINA INFORMATIKA SOLUSI<br/>
+									
+										<img src="<?php echo base_url(); ?>assets/images/ttd.png" width="150px" height="70px">
+										<br/> <strong>( an. Lusy Anjelita )</strong>		
 								</td>
 							</tr>		
 
@@ -282,7 +285,10 @@
 				<td >&nbsp; </td>
 				
 				<td colspan="2" align="center">Cirebon, <?php echo isset($tanggal)?$tanggal:''; ?> <?php echo isset($bulan_tagihan)?$bulan_tagihan:''; ?><br>
-					PT. BINA INFORMATIKA SOLUSI
+					PT. BINA INFORMATIKA SOLUSI<br/>
+									
+					<img src="<?php echo base_url(); ?>assets/images/ttd.png" width="150px" height="70px">
+					<br/> <strong>( an. Lusy Anjelita )</strong>				
 				</td>
 			</tr>		
 
