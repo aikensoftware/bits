@@ -170,7 +170,7 @@
 									PT. BINA INFORMATIKA SOLUSI<br/>
 									
 										<img src="<?php echo base_url(); ?>assets/images/ttd.png" width="150px" height="70px">
-										<br/> <strong>( an. Lusy Anjelita )</strong>		
+										<br/> <strong>( Lusy Anjelita )</strong>		
 								</td>
 							</tr>		
 
@@ -291,7 +291,7 @@
 					PT. BINA INFORMATIKA SOLUSI<br/>
 									
 					<img src="<?php echo base_url(); ?>assets/images/ttd.png" width="150px" height="70px">
-					<br/> <strong>( an. Lusy Anjelita )</strong>				
+					<br/> <strong>( Lusy Anjelita )</strong>				
 				</td>
 			</tr>		
 
